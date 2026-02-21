@@ -1,0 +1,7 @@
+# Rust build artifacts
+backend/target/
+
+# Node modules and frontend build
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
