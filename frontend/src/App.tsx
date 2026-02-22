@@ -13,7 +13,7 @@ function App() {
       fetch('http://localhost:3000/api/state')
         .then((res) => res.json())
         .then((data: Node[]) => setNodes(data))
-        .catch(() => {})
+        .catch((error) => console.error('Failed to fetch state:', error))
     }
 
     fetchState()
