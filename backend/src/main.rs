@@ -67,6 +67,7 @@ async fn main() {
     let app = Router::new()
         .route("/api/state", get(get_state))
         .with_state(shared_state)
+        // TODO: Restrict CORS in production; this permissive configuration is intended for local development only.
         .layer(CorsLayer::permissive());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
