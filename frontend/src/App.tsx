@@ -17,7 +17,7 @@ function App() {
     }
 
     fetchState()
-    const interval = setInterval(fetchState, 500)
+    const interval = setInterval(fetchState, 1000)
     return () => clearInterval(interval)
   }, [])
 
