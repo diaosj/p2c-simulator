@@ -114,12 +114,14 @@ async fn main() {
     });
 
     // Background task: Simulator – generates ~5000 QPS traffic
+    // 50 requests per tick × 100 ticks/sec (10ms interval) = ~5000 QPS
+    const REQUESTS_PER_TICK: usize = 50;
+    const TICK_INTERVAL_MS: u64 = 10;
     let sim_state = app_state.clone();
     tokio::spawn(async move {
         loop {
-            tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
-            // Spawn 50 concurrent requests per tick
-            for _ in 0..50 {
+            tokio::time::sleep(tokio::time::Duration::from_millis(TICK_INTERVAL_MS)).await;
+            for _ in 0..REQUESTS_PER_TICK {
                 let st = sim_state.clone();
                 tokio::spawn(async move {
                     let idx = {
