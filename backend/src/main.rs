@@ -33,8 +33,8 @@ impl AppState {
         let mut rng = rand::thread_rng();
         let len = nodes.len();
 
-        match *self.current_strategy.try_read().unwrap_or_else(|_| {
-            panic!("Failed to read strategy lock in route_request")
+        match *self.current_strategy.try_read().unwrap_or_else(|e| {
+            panic!("Strategy RwLock poisoned in route_request: {}", e)
         }) {
             Strategy::Random => rng.gen_range(0..len),
             Strategy::GlobalLeast => {
@@ -47,10 +47,11 @@ impl AppState {
             }
             Strategy::P2C => {
                 let a = rng.gen_range(0..len);
-                let mut b = rng.gen_range(0..len);
-                while b == a && len > 1 {
-                    b = rng.gen_range(0..len);
-                }
+                let b = if len > 1 {
+                    (a + rng.gen_range(1..len)) % len
+                } else {
+                    a
+                };
                 if nodes[a].error_429_count <= nodes[b].error_429_count {
                     a
                 } else {
@@ -117,7 +118,6 @@ async fn main() {
     tokio::spawn(async move {
         loop {
             tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
-            let sim_state = sim_state.clone();
             // Spawn 50 concurrent requests per tick
             for _ in 0..50 {
                 let st = sim_state.clone();
